@@ -6,6 +6,8 @@
 
 A Logseq desktop plugin for OpenPGP-compatible encryption and decryption of block content directly within the editor.
 
+![CipherBlock demo](docs/assets/demo.gif)
+
 ## Features
 
 - **Key Management** — Import, list, and remove OpenPGP public and private keys without leaving Logseq

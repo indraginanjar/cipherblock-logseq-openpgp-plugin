@@ -1,0 +1,40 @@
+name: Build plugin
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Package plugin
+        run: |
+          mkdir -p release
+          cp -r dist release/
+          cp package.json release/
+          cp README.md release/
+          cp LICENSE release/
+          cp icon.png release/
+          cd release && zip -r ../logseq-cipherblock.zip .
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: logseq-cipherblock.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
