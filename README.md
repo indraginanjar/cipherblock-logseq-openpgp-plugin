@@ -1,6 +1,10 @@
 # CipherBlock – Logseq OpenPGP Plugin
 
-🔐 A Logseq desktop plugin for OpenPGP-compatible encryption and decryption of block content directly within the editor.
+<p align="center">
+  <img src="icon.png" alt="CipherBlock icon" width="128" />
+</p>
+
+A Logseq desktop plugin for OpenPGP-compatible encryption and decryption of block content directly within the editor.
 
 ## Features
 
