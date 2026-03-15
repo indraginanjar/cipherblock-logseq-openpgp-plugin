@@ -12,7 +12,7 @@
   "logseq": {
     "id": "logseq-cipherblock",
     "title": "CipherBlock – OpenPGP Encryption",
-    "icon": "🔐",
+    "icon": "./icon.png",
     "main": "dist/index.html"
   },
   "dependencies": {
