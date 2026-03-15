@@ -28,9 +28,10 @@ export class DecryptionService implements IDecryptionService {
       throw new InvalidCiphertextError('Block does not contain encrypted content');
     }
 
-    const storedKey = await this.keyStore.getKey(privateKeyFingerprint);
+    const privateKeys = await this.keyStore.getPrivateKeys();
+    const storedKey = privateKeys.find((k) => k.fingerprint === privateKeyFingerprint) ?? null;
     if (!storedKey) {
-      throw new NoKeysError('Import a private key first');
+      throw new NoKeysError('No matching private key found. Import one via /🔑 Import Key');
     }
 
     return this.attemptDecryption(armoredMessage, storedKey.armoredKey, passphraseProvider);
@@ -79,7 +80,18 @@ export class DecryptionService implements IDecryptionService {
     passphraseProvider: () => Promise<string>,
   ): Promise<DecryptionResult> {
     for (let attempt = 0; attempt < MAX_PASSPHRASE_ATTEMPTS; attempt++) {
-      const passphrase = await passphraseProvider();
+      let passphrase: string;
+      try {
+        passphrase = await passphraseProvider();
+      } catch {
+        // Provider cancelled (e.g. dialog dismissed)
+        throw new PassphraseError('Decryption cancelled');
+      }
+
+      // Empty passphrase means user cancelled
+      if (!passphrase && attempt === 0) {
+        throw new PassphraseError('Decryption cancelled');
+      }
 
       try {
         const plaintext = await this.pgpAdapter.decrypt(armoredMessage, armoredKey, passphrase);
@@ -107,7 +119,11 @@ export class DecryptionService implements IDecryptionService {
 
   private isPassphraseNeeded(errorMessage: string): boolean {
     const lower = errorMessage.toLowerCase();
-    return lower.includes('incorrect key passphrase') || lower.includes('passphrase');
+    return (
+      lower.includes('passphrase') ||
+      lower.includes('not decrypted') ||
+      lower.includes('key is not decrypted')
+    );
   }
 
   private isKeyMismatch(errorMessage: string): boolean {

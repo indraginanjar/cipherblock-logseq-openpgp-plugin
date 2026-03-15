@@ -20,8 +20,8 @@ export class KeyStore implements IKeyStore {
     const parsed = await this.pgpAdapter.parseKey(armoredKey);
     const keys = await this.loadKeys();
 
-    if (keys.some((k) => k.fingerprint === parsed.fingerprint)) {
-      throw new DuplicateKeyError(`Key already exists: ${parsed.fingerprint}`);
+    if (keys.some((k) => k.fingerprint === parsed.fingerprint && k.type === parsed.type)) {
+      throw new DuplicateKeyError(`${parsed.type} key already exists: ${parsed.fingerprint}`);
     }
 
     const storedKey: StoredKey = {

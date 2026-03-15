@@ -14,6 +14,17 @@ import { SettingsManager } from './settings-manager';
 import { showRecipientDialog, showKeySelectionDialog, showPassphrasePrompt, showImportKeyDialog, showKeyManagerDialog } from './ui';
 import { handleError } from './error-handler';
 
+/** Safe wrapper around logseq.UI.showMsg that swallows internal Logseq errors. */
+function notify(msg: string, status?: 'success' | 'warning' | 'error'): void {
+  try {
+    logseq.UI.showMsg(msg, status).catch(() => {
+      // Swallow Logseq internal errors (e.g. path.cljs bug)
+    });
+  } catch {
+    // Swallow synchronous errors
+  }
+}
+
 /** Dependencies required by the command module. */
 export interface CommandDeps {
   keyStore: IKeyStore;
@@ -59,7 +70,7 @@ export function registerCommands(deps: CommandDeps): void {
   async function encryptBlock(blockUuid: string): Promise<void> {
     const block = await logseq.Editor.getBlock(blockUuid);
     if (!block || !block.content) {
-      logseq.UI.showMsg('No block content to encrypt', 'warning');
+      notify('No block content to encrypt', 'warning');
       return;
     }
 
@@ -67,7 +78,7 @@ export function registerCommands(deps: CommandDeps): void {
 
     const publicKeys = await keyStore.getPublicKeys();
     if (publicKeys.length === 0) {
-      logseq.UI.showMsg('Import a public key first', 'error');
+      notify('Import a public key first via /🔑 Import Key', 'warning');
       return;
     }
 
@@ -86,7 +97,7 @@ export function registerCommands(deps: CommandDeps): void {
       await metadataWriter.writeMetadata(blockUuid, metadata, settings.metadataMode);
     }
 
-    logseq.UI.showMsg(`Encrypted for ${encryptionResult.recipientCount} recipient(s)`, 'success');
+    notify(`Encrypted for ${encryptionResult.recipientCount} recipient(s)`, 'success');
   }
 
   // --- Decrypt flow (shared logic) ---
@@ -97,13 +108,13 @@ export function registerCommands(deps: CommandDeps): void {
     const blockText = block.content;
     const armoredMessage = extractArmoredMessage(blockText);
     if (!armoredMessage) {
-      logseq.UI.showMsg('Block does not contain encrypted content', 'error');
+      notify('Block does not contain encrypted content', 'warning');
       return;
     }
 
     const privateKeys = await keyStore.getPrivateKeys();
     if (privateKeys.length === 0) {
-      logseq.UI.showMsg('Import a private key first', 'error');
+      notify('Import a private key first via /🔑 Import Key', 'warning');
       return;
     }
 
@@ -117,7 +128,14 @@ export function registerCommands(deps: CommandDeps): void {
       fingerprint = selected;
     }
 
-    const passphraseProvider = () => showPassphrasePrompt();
+    const passphraseProvider = async () => {
+      try {
+        return await showPassphrasePrompt();
+      } catch {
+        // User cancelled the passphrase dialog — return empty to signal cancellation
+        return '';
+      }
+    };
 
     const decryptionResult = await decryptionService.decrypt(
       armoredMessage,
@@ -125,8 +143,10 @@ export function registerCommands(deps: CommandDeps): void {
       passphraseProvider,
     );
 
+    if (!decryptionResult.plaintext) return;
+
     await outputHandler.placeResult(blockUuid, decryptionResult.plaintext, settings.outputMode);
-    logseq.UI.showMsg('Decryption successful', 'success');
+    notify('Decryption successful', 'success');
   }
 
   // --- Vault flow (shared logic) ---
@@ -138,7 +158,7 @@ export function registerCommands(deps: CommandDeps): void {
 
     const publicKeys = await keyStore.getPublicKeys();
     if (publicKeys.length === 0) {
-      logseq.UI.showMsg('Import a public key first', 'error');
+      notify('Import a public key first via /🔑 Import Key', 'warning');
       return;
     }
 
@@ -149,7 +169,7 @@ export function registerCommands(deps: CommandDeps): void {
     const { recipients } = dialogResult;
 
     const vaultResult = await vaultService.encryptToVault(blockUuid, blockText, recipients);
-    logseq.UI.showMsg(`Encrypted to ${vaultResult.vaultPageName}`, 'success');
+    notify(`Encrypted to ${vaultResult.vaultPageName}`, 'success');
   }
 
   // --- Register slash commands ---
@@ -158,7 +178,7 @@ export function registerCommands(deps: CommandDeps): void {
       const armoredKey = await showImportKeyDialog();
       if (!armoredKey) return;
       const stored = await keyStore.importKey(armoredKey);
-      logseq.UI.showMsg(
+      notify(
         `Imported ${stored.type} key: ${stored.userID || stored.fingerprint}`,
         'success',
       );
@@ -173,7 +193,7 @@ export function registerCommands(deps: CommandDeps): void {
       const fpToRemove = await showKeyManagerDialog(keys);
       if (fpToRemove) {
         await keyStore.removeKey(fpToRemove);
-        logseq.UI.showMsg('Key removed', 'success');
+        notify('Key removed', 'success');
       }
     } catch (error) {
       handleError(error);
