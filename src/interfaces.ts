@@ -59,9 +59,9 @@ export interface IDecryptionService {
   ): Promise<DecryptionResult>;
 }
 
-/** Places results according to the active output mode. */
+/** Places results according to the active output mode. Returns the UUID of the block containing the result (null for clipboard). */
 export interface IOutputHandler {
-  placeResult(blockUuid: string, resultText: string, mode: OutputMode): Promise<void>;
+  placeResult(blockUuid: string, resultText: string, mode: OutputMode): Promise<string | null>;
 }
 
 /** Orchestrates vault page creation and encrypted storage. */

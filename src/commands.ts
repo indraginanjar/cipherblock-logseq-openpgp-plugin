@@ -89,12 +89,12 @@ export function registerCommands(deps: CommandDeps): void {
     const { recipients, outputMode } = dialogResult;
 
     const encryptionResult = await encryptionService.encrypt(blockText, recipients);
-    await outputHandler.placeResult(blockUuid, encryptionResult.armoredMessage, outputMode);
+    const cipherBlockUuid = await outputHandler.placeResult(blockUuid, encryptionResult.armoredMessage, outputMode);
 
-    // Write metadata if enabled
-    if (settings.metadataEnabled) {
+    // Write metadata to the block containing the ciphertext (not the source block)
+    if (settings.metadataEnabled && cipherBlockUuid) {
       const metadata = await buildEncryptionMetadata(recipients, keyStore);
-      await metadataWriter.writeMetadata(blockUuid, metadata, settings.metadataMode);
+      await metadataWriter.writeMetadata(cipherBlockUuid, metadata, settings.metadataMode);
     }
 
     notify(`Encrypted for ${encryptionResult.recipientCount} recipient(s)`, 'success');

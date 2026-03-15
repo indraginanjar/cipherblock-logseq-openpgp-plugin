@@ -6,19 +6,21 @@ import type { OutputMode } from './types';
 
 /** Places encryption/decryption results according to the active output mode. */
 export class OutputHandler implements IOutputHandler {
-  async placeResult(blockUuid: string, resultText: string, mode: OutputMode): Promise<void> {
+  async placeResult(blockUuid: string, resultText: string, mode: OutputMode): Promise<string | null> {
     switch (mode) {
       case 'replace':
         await logseq.Editor.updateBlock(blockUuid, resultText);
-        break;
+        return blockUuid;
 
-      case 'sibling':
-        await logseq.Editor.insertBlock(blockUuid, resultText, { sibling: true });
-        break;
+      case 'sibling': {
+        const block = await logseq.Editor.insertBlock(blockUuid, resultText, { sibling: true });
+        return block?.uuid ?? null;
+      }
 
-      case 'sub-block':
-        await logseq.Editor.insertBlock(blockUuid, resultText, { sibling: false });
-        break;
+      case 'sub-block': {
+        const block = await logseq.Editor.insertBlock(blockUuid, resultText, { sibling: false });
+        return block?.uuid ?? null;
+      }
 
       case 'clipboard':
         try {
@@ -29,7 +31,7 @@ export class OutputHandler implements IOutputHandler {
             err instanceof Error ? err : undefined,
           );
         }
-        break;
+        return null;
     }
   }
 }
