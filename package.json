@@ -2,10 +2,10 @@
   "name": "logseq-cipherblock",
   "version": "0.1.0",
   "description": "Logseq desktop plugin for OpenPGP-compatible encryption and decryption of block content",
-  "main": "dist/main.js",
+  "main": "dist/index.html",
   "scripts": {
-    "build": "esbuild src/main.ts --bundle --platform=browser --format=iife --outfile=dist/main.js --external:@logseq/libs",
-    "dev": "esbuild src/main.ts --bundle --platform=browser --format=iife --outfile=dist/main.js --external:@logseq/libs --watch",
+    "build": "esbuild src/main.ts --bundle --platform=browser --format=iife --outfile=dist/main.js --external:@logseq/libs --external:openpgp && node -e \"require('fs').copyFileSync('src/index.html','dist/index.html')\"",
+    "dev": "esbuild src/main.ts --bundle --platform=browser --format=iife --outfile=dist/main.js --external:@logseq/libs --external:openpgp --watch",
     "test": "vitest --run",
     "test:watch": "vitest"
   },
@@ -13,7 +13,7 @@
     "id": "logseq-cipherblock",
     "title": "CipherBlock – OpenPGP Encryption",
     "icon": "🔐",
-    "main": "dist/main.js"
+    "main": "dist/index.html"
   },
   "dependencies": {
     "@logseq/libs": "^0.0.17",

@@ -11,7 +11,7 @@ import type {
 } from './interfaces';
 import type { EncryptionMetadata } from './types';
 import { SettingsManager } from './settings-manager';
-import { showRecipientDialog, showKeySelectionDialog, showPassphrasePrompt } from './ui';
+import { showRecipientDialog, showKeySelectionDialog, showPassphrasePrompt, showImportKeyDialog, showKeyManagerDialog } from './ui';
 import { handleError } from './error-handler';
 
 /** Dependencies required by the command module. */
@@ -58,7 +58,10 @@ export function registerCommands(deps: CommandDeps): void {
   // --- Encrypt flow (shared logic) ---
   async function encryptBlock(blockUuid: string): Promise<void> {
     const block = await logseq.Editor.getBlock(blockUuid);
-    if (!block) return;
+    if (!block || !block.content) {
+      logseq.UI.showMsg('No block content to encrypt', 'warning');
+      return;
+    }
 
     const blockText = block.content;
 
@@ -150,7 +153,34 @@ export function registerCommands(deps: CommandDeps): void {
   }
 
   // --- Register slash commands ---
-  logseq.Editor.registerSlashCommand('encrypt-block', async (e) => {
+  logseq.Editor.registerSlashCommand('🔑 Import Key', async () => {
+    try {
+      const armoredKey = await showImportKeyDialog();
+      if (!armoredKey) return;
+      const stored = await keyStore.importKey(armoredKey);
+      logseq.UI.showMsg(
+        `Imported ${stored.type} key: ${stored.userID || stored.fingerprint}`,
+        'success',
+      );
+    } catch (error) {
+      handleError(error);
+    }
+  });
+
+  logseq.Editor.registerSlashCommand('🔑 Manage Keys', async () => {
+    try {
+      const keys = await keyStore.listKeys();
+      const fpToRemove = await showKeyManagerDialog(keys);
+      if (fpToRemove) {
+        await keyStore.removeKey(fpToRemove);
+        logseq.UI.showMsg('Key removed', 'success');
+      }
+    } catch (error) {
+      handleError(error);
+    }
+  });
+
+  logseq.Editor.registerSlashCommand('🔒 Encrypt Block', async (e) => {
     try {
       await encryptBlock(e.uuid);
     } catch (error) {
@@ -158,7 +188,7 @@ export function registerCommands(deps: CommandDeps): void {
     }
   });
 
-  logseq.Editor.registerSlashCommand('decrypt-block', async (e) => {
+  logseq.Editor.registerSlashCommand('🔓 Decrypt Block', async (e) => {
     try {
       await decryptBlock(e.uuid);
     } catch (error) {
@@ -166,7 +196,7 @@ export function registerCommands(deps: CommandDeps): void {
     }
   });
 
-  logseq.Editor.registerSlashCommand('encrypt-to-vault', async (e) => {
+  logseq.Editor.registerSlashCommand('🔒 Encrypt to Vault', async (e) => {
     try {
       await encryptToVault(e.uuid);
     } catch (error) {

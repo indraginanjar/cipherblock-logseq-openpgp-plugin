@@ -8,18 +8,28 @@ import type { IStorageAdapter } from './interfaces';
  */
 export class StorageAdapter implements IStorageAdapter {
   async get(key: string): Promise<string | null> {
-    const value = await logseq.Storage.getItem(key);
-    if (value === undefined || value === null) {
+    try {
+      const exists = await logseq.FileStorage.hasItem(key);
+      if (!exists) return null;
+      const value = await logseq.FileStorage.getItem(key);
+      if (value === undefined || value === null) {
+        return null;
+      }
+      return String(value);
+    } catch {
       return null;
     }
-    return String(value);
   }
 
   async set(key: string, value: string): Promise<void> {
-    await logseq.Storage.setItem(key, value);
+    await logseq.FileStorage.setItem(key, value);
   }
 
   async remove(key: string): Promise<void> {
-    await logseq.Storage.removeItem(key);
+    try {
+      await logseq.FileStorage.removeItem(key);
+    } catch {
+      // Ignore removal errors for non-existent keys
+    }
   }
 }

@@ -1,4 +1,3 @@
-import '@logseq/libs';
 import { OpenPGPAdapter } from './openpgp-adapter';
 import { StorageAdapter } from './storage-adapter';
 import { KeyStore } from './key-store';

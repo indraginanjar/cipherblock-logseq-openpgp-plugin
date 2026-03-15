@@ -3,9 +3,13 @@ import { CipherBlockError } from './errors';
 export function handleError(error: unknown): void {
   if (error instanceof CipherBlockError) {
     logseq.UI.showMsg(error.userMessage, 'error');
-    console.error(error.cause ?? error);
+    console.error('[CipherBlock]', error.userMessage, error.cause ?? error);
   } else {
-    logseq.UI.showMsg('An unexpected error occurred', 'error');
-    console.error(error);
+    const msg = error instanceof Error ? error.message : String(error);
+    logseq.UI.showMsg(`CipherBlock error: ${msg}`, 'error');
+    console.error('[CipherBlock] Unexpected error:', error);
+    if (error instanceof Error && error.stack) {
+      console.error('[CipherBlock] Stack:', error.stack);
+    }
   }
 }
