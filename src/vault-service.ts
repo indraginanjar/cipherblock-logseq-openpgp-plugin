@@ -51,9 +51,13 @@ export class VaultService implements IVaultService {
     // Create vault page
     await logseq.Editor.createPage(vaultPageName);
 
-    // Get first block of the page and insert armored message as sub-block
+    // Set first block content to page title with [[Vault]] link
     const blocks = await logseq.Editor.getPageBlocksTree(vaultPageName);
     const firstBlock = blocks[0];
+    const titleBlock = `[[Vault]]-${hex}`;
+    await logseq.Editor.updateBlock(firstBlock.uuid, titleBlock);
+
+    // Insert armored message as sub-block
     const insertedBlock = await logseq.Editor.insertBlock(
       firstBlock.uuid,
       encryptionResult.armoredMessage,
