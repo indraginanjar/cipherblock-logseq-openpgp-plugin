@@ -85,11 +85,12 @@ export function showRecipientDialog(
   return new Promise((resolve) => {
     cleanupDialog();
 
+    const autoCheck = publicKeys.length === 1;
     const keyCheckboxes = publicKeys
       .map(
         (k, i) =>
           `<label>
-            <input type="checkbox" name="cb-recipient" value="${k.fingerprint}" data-index="${i}" />
+            <input type="checkbox" name="cb-recipient" value="${k.fingerprint}" data-index="${i}"${autoCheck ? ' checked' : ''} />
             <span>${shortFingerprint(k.fingerprint)} – ${escapeHtml(k.userID)}</span>
           </label>`,
       )
