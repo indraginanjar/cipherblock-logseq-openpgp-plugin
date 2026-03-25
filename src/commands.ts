@@ -69,7 +69,7 @@ export function registerCommands(deps: CommandDeps): void {
   // --- Encrypt flow (shared logic) ---
   async function encryptBlock(blockUuid: string): Promise<void> {
     const block = await logseq.Editor.getBlock(blockUuid);
-    if (!block || !block.content) {
+    if (!block?.content) {
       notify('No block content to encrypt', 'warning');
       return;
     }

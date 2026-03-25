@@ -391,17 +391,14 @@ export function showImportKeyDialog(): Promise<string | null> {
     const fileNameSpan = doc.getElementById('cipherblock-file-name') as HTMLSpanElement | null;
 
     // When a file is picked, read it and populate the textarea
-    const onFileChange = () => {
+    const onFileChange = async () => {
       const file = fileInput?.files?.[0];
       if (!file) return;
       if (fileNameSpan) fileNameSpan.textContent = file.name;
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (textarea && typeof reader.result === 'string') {
-          textarea.value = reader.result;
-        }
-      };
-      reader.readAsText(file);
+      const text = await file.text();
+      if (textarea) {
+        textarea.value = text;
+      }
     };
 
     fileInput?.addEventListener('change', onFileChange);
@@ -496,11 +493,11 @@ export function showKeyManagerDialog(
     };
 
     const onRemoveClick = (e: Event) => {
-      const btn = (e.target as HTMLElement).closest('.cb-remove-key-btn') as HTMLElement | null;
+      const btn = (e.target as HTMLElement).closest('.cb-remove-key-btn');
       if (btn) {
-        const fp = btn.getAttribute('data-fp');
+        const fp = (btn as HTMLElement).dataset.fp;
         cleanup();
-        resolve(fp);
+        resolve(fp ?? null);
       }
     };
 
