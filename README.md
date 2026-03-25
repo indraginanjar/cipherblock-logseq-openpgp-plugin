@@ -4,6 +4,9 @@
   <img src="icon.png" alt="CipherBlock icon" width="128" />
 </p>
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/indraginanjar/cipherblock-logseq-openpgp-plugin)](https://github.com/indraginanjar/cipherblock-logseq-openpgp-plugin/releases)
+
 A Logseq desktop plugin for OpenPGP-compatible encryption and decryption of block content directly within the editor.
 
 ![CipherBlock demo](docs/assets/demo.gif)
@@ -20,11 +23,17 @@ A Logseq desktop plugin for OpenPGP-compatible encryption and decryption of bloc
 
 ## Installation
 
+### From Logseq Marketplace
+
+1. Open Logseq and go to **Plugins → Marketplace**
+2. Search for "CipherBlock"
+3. Click **Install**
+
 ### Build from Source
 
 ```bash
 git clone https://github.com/indraginanjar/cipherblock-logseq-openpgp-plugin.git
-cd logseq-cipherblock
+cd cipherblock-logseq-openpgp-plugin
 npm install
 npm run build
 ```
@@ -171,6 +180,31 @@ Access settings via **Logseq → Plugins → CipherBlock → Settings**.
 | `passphraseCachingEnabled` | boolean | `false` | Cache passphrase in memory for the current session |
 | `metadataEnabled` | boolean | `false` | Record recipient info, timestamp, and algorithm alongside encrypted content |
 | `metadataMode` | enum | `attributes` | How metadata is written: `attributes` (block properties) or `sub-blocks` (child blocks) |
+
+## Security Considerations
+
+- CipherBlock is not audited by a third-party security firm. Use at your own risk for sensitive data.
+- Keys are stored in Logseq's plugin storage directory on your local disk (inside `.logseq/plugins/`). They are not uploaded anywhere.
+- Passphrase-protected private keys are never decrypted at rest — the passphrase is requested each time (unless session caching is enabled).
+- Session passphrase caching stores the passphrase in memory only. It is cleared when Logseq is closed.
+- OpenPGP.js runs entirely in the browser sandbox. No data leaves your machine.
+- The plugin loads OpenPGP.js from a CDN (`unpkg.com`) on first use. If you require fully offline operation, consider bundling the library locally.
+
+## Known Limitations
+
+- Desktop only — Logseq mobile does not support plugins.
+- No GPG agent integration — the plugin cannot use your system keyring or `gpg-agent` for passphrase caching.
+- No key generation — you must generate keys externally (e.g. with GnuPG) and import them.
+- No signature support — CipherBlock encrypts and decrypts but does not sign or verify messages.
+- Large blocks may be slow to encrypt/decrypt depending on key size and browser performance.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a list of changes in each release.
 
 ## License
 
