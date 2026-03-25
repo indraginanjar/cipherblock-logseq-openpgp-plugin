@@ -75,20 +75,20 @@ gpg --armor --export-secret-keys your@email.com > ~/my-private-key.asc
 
 **Option A — File picker (recommended)**
 
-1. In any Logseq block, type `/🔑 Import Key`
+1. In any Logseq block, type `/Import Key`
 2. Click **Choose File** and select your `.asc` file
 3. Click **Import**
 
 **Option B — Paste**
 
 1. Copy the contents of your `.asc` file (including the `-----BEGIN PGP ...-----` headers)
-2. Type `/🔑 Import Key`
+2. Type `/Import Key`
 3. Paste into the text area
 4. Click **Import**
 
 #### Step 3 — Verify
 
-Type `/🔑 Manage Keys` to see your imported keys listed with their fingerprint, user ID, and type (public/private).
+Type `/Manage Keys` to see your imported keys listed with their fingerprint, user ID, and type (public/private).
 
 ### Compatibility with GnuPG
 
@@ -120,13 +120,15 @@ Import as many as you need. When encrypting, you select which recipients to encr
 
 ### Slash Commands
 
+Type `/` in any block and search for the command name. The emoji prefixes appear in the menu automatically — you don't need to type them.
+
 | Command | Description |
 |---|---|
-| `/🔑 Import Key` | Import a public or private key from file or paste |
-| `/🔑 Manage Keys` | View and remove imported keys |
-| `/🔒 Encrypt Block` | Encrypt the current block for selected recipients |
-| `/🔓 Decrypt Block` | Decrypt an armored PGP message in the current block |
-| `/🔒 Encrypt to Vault` | Encrypt to a dedicated vault page |
+| `/Import Key` | Import a public or private key from file or paste |
+| `/Manage Keys` | View and remove imported keys |
+| `/Encrypt Block` | Encrypt the current block for selected recipients |
+| `/Decrypt Block` | Decrypt an armored PGP message in the current block |
+| `/Encrypt to Vault` | Encrypt to a dedicated vault page |
 
 ### Block Context Menu
 
@@ -138,7 +140,7 @@ Right-click any block dot to access:
 ### Encrypt a Block
 
 1. Place your cursor in the block you want to encrypt
-2. Type `/🔒 Encrypt Block` or right-click and select **Encrypt Block**
+2. Type `/Encrypt Block` or right-click and select **Encrypt Block**
 3. Select one or more recipient public keys
 4. Optionally override the output mode
 5. The block content is replaced with (or accompanied by) the armored PGP message
@@ -146,7 +148,7 @@ Right-click any block dot to access:
 ### Decrypt a Block
 
 1. Place your cursor in a block containing an armored PGP message
-2. Type `/🔓 Decrypt Block` or right-click and select **Decrypt Block**
+2. Type `/Decrypt Block` or right-click and select **Decrypt Block**
 3. The plugin uses your default private key (or prompts you to select one)
 4. Enter your passphrase if the key is protected
 5. The decrypted plaintext is placed according to your output mode setting
@@ -154,7 +156,7 @@ Right-click any block dot to access:
 ### Encrypt to Vault
 
 1. Place your cursor in the block you want to encrypt
-2. Type `/🔒 Encrypt to Vault` or right-click and select **Encrypt to Vault**
+2. Type `/Encrypt to Vault` or right-click and select **Encrypt to Vault**
 3. Select recipient public keys
 4. A new vault page is created with the encrypted content, and the original block is replaced with a link to the vault page
 
