@@ -1,5 +1,7 @@
 # CipherBlock – Logseq OpenPGP Plugin
 
+![CI](https://github.com/indraginanjar/cipherblock-logseq-openpgp-plugin/actions/workflows/ci.yml/badge.svg?branch=master)
+
 <p align="center">
   <img src="icon.png" alt="CipherBlock icon" width="128" />
 </p>
