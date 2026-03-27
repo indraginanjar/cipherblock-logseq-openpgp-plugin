@@ -25,13 +25,13 @@ A Logseq desktop plugin for OpenPGP-compatible encryption and decryption of bloc
 
 ## Installation
 
-### From Logseq Marketplace
+### Option A: From Logseq Marketplace
 
 1. Open Logseq and go to **Plugins → Marketplace**
 2. Search for "CipherBlock"
 3. Click **Install**
 
-### Build from Source
+### Option B: Build from Source
 
 ```bash
 git clone https://github.com/indraginanjar/cipherblock-logseq-openpgp-plugin.git
@@ -40,7 +40,7 @@ npm install
 npm run build
 ```
 
-### Load in Logseq
+Then load it in Logseq:
 
 1. Open Logseq and go to **Settings → Advanced → Developer mode** (enable it)
 2. Click **Plugins → Load unpacked plugin**
